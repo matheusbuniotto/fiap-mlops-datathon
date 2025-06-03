@@ -1,0 +1,93 @@
+# Data Catalog - defines all data sources and destinations
+# This file tells Kedro how to load and save your data
+
+# Raw JSON datasets (inputs)
+raw_applicants:
+  type: json.JSONDataset
+  filepath: data/01_raw/applicants.json
+  
+raw_vagas:
+  type: json.JSONDataset
+  filepath: data/01_raw/vagas.json
+  
+raw_prospects:
+  type: json.JSONDataset
+  filepath: data/01_raw/prospects.json
+
+# Intermediate processed datasets (memory only)
+processed_applicants:
+  type: MemoryDataset
+  
+processed_vagas:
+  type: MemoryDataset
+  
+processed_prospects:
+  type: MemoryDataset
+
+# Bronze layer datasets (Parquet outputs)
+bronze_applicants:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/applicants.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+    
+bronze_vagas:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/vagas.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+    
+bronze_prospects:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/prospects.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+
+# Silver layer SQL files
+sql_applicants:
+  type: text.TextDataset
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/applicants.sql
+
+sql_vagas:
+  type: text.TextDataset
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/vagas.sql
+
+sql_prospects:
+  type: text.TextDataset
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/prospects.sql
+
+sql_core:
+  type: text.TextDataset
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/core_applicants_jobs_prospects.sql
+
+# Silver layer datasets (Parquet outputs)
+silver_applicants:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/applicants.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+    
+silver_vagas:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/vagas.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+    
+silver_prospects:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/prospects.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow
+
+silver_core:
+  type: pandas.ParquetDataset
+  filepath: data/03_primary/core_applicants_jobs_prospects.parquet
+  save_args:
+    compression: snappy
+    engine: pyarrow

@@ -1,0 +1,27 @@
+# Parameters file - configuration for your pipeline
+# You can access these parameters in your nodes using the parameters argument
+
+# Processing configuration
+processing:
+  chunk_size: 10000
+  compression: "snappy"
+  include_metadata: true
+  normalize_columns: true
+
+# Data quality settings
+data_quality:
+  drop_empty_rows: true
+  fill_missing_strings: ""
+  validate_schema: true
+
+# Logging configuration
+logging:
+  level: "INFO"
+  log_processing_stats: true
+  log_errors_to_file: true
+
+# File processing settings
+file_processing:
+  skip_empty_files: true
+  continue_on_error: true
+  backup_original: false
