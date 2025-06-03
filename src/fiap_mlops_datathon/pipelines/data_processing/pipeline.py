@@ -4,48 +4,48 @@ This pipeline orchestrates the data processing flow.
 """
 
 from kedro.pipeline import Pipeline, node, pipeline
-from .nodes import process_silver_tables, process_core_silver
+from .nodes import process_primary_tables, process_core_primary
 
-def create_silver_layer_pipeline(**kwargs) -> Pipeline:
+def create_primary_layer_pipeline(**kwargs) -> Pipeline:
     """
-    Create the silver layer processing pipeline.
+    Create the primary layer processing pipeline.
 
     Returns:
-        Kedro pipeline for processing data to silver layer
+        Kedro pipeline for processing data to primary layer
     """
     return pipeline([
         # Process all individual tables in a single node
         node(
-            func=process_silver_tables,
+            func=process_primary_tables,
             inputs={
                 "applicants_sql": "sql_applicants",
                 "prospects_sql": "sql_prospects",
                 "vagas_sql": "sql_vagas",
-                "bronze_applicants": "bronze_applicants",
-                "bronze_prospects": "bronze_prospects",
-                "bronze_vagas": "bronze_vagas"
+                "intermediate_applicants": "intermediate_applicants",
+                "intermediate_prospects": "intermediate_prospects",
+                "intermediate_vagas": "intermediate_vagas"
             },
             outputs={
-                "silver_applicants": "silver_applicants",
-                "silver_prospects": "silver_prospects",
-                "silver_vagas": "silver_vagas"
+                "primary_applicants": "primary_applicants",
+                "primary_prospects": "primary_prospects",
+                "primary_vagas": "primary_vagas"
             },
-            name="process_silver_tables_node",
-            tags=["silver", "tables"]
+            name="process_primary_tables_node",
+            tags=["primary", "tables"]
         ),
         
         # Process final table with joins
         node(
-            func=process_core_silver,
+            func=process_core_primary,
             inputs=[
                 "sql_core",
-                "silver_applicants",
-                "silver_vagas", 
-                "silver_prospects"
+                "primary_applicants",
+                "primary_vagas", 
+                "primary_prospects"
             ],
-            outputs="silver_core",
-            name="process_silver_core_node",
-            tags=["silver", "core"]
+            outputs="primary_core",
+            name="process_primary_core_node",
+            tags=["primary", "core"]
         )
     ])
 
@@ -56,4 +56,4 @@ def create_pipeline(**kwargs) -> Pipeline:
     Returns:
         Complete pipeline for the project
     """
-    return create_silver_layer_pipeline()
+    return create_primary_layer_pipeline()

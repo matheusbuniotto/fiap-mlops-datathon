@@ -9,11 +9,11 @@ from fiap_mlops_datathon.pipelines.data_processing import create_pipeline as dat
 def register_pipelines() -> Dict[str, Pipeline]:
     """Register the project's pipelines."""
     json_processing_pipeline = json_processing()
-    silver_processing_pipeline = data_processing()
+    primary_processing_pipeline = data_processing()
     
     return {
-        "__default__": json_processing_pipeline + silver_processing_pipeline,
+        "__default__": json_processing_pipeline + primary_processing_pipeline,
         "json_processing": json_processing_pipeline,
-        "silver_processing": silver_processing_pipeline,
-        "full": json_processing_pipeline + silver_processing_pipeline,
+        "primary_processing": primary_processing_pipeline,
+        "full": json_processing_pipeline + primary_processing_pipeline,
     }

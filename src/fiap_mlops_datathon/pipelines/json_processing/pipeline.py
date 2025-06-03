@@ -23,9 +23,9 @@ def create_json_to_parquet_pipeline(**kwargs) -> Pipeline:
                 "raw_prospects": "raw_prospects"
             },
             outputs={
-                "bronze_applicants": "bronze_applicants",
-                "bronze_vagas": "bronze_vagas",
-                "bronze_prospects": "bronze_prospects"
+                "intermediate_applicants": "intermediate_applicants",
+                "intermediate_vagas": "intermediate_vagas",
+                "intermediate_prospects": "intermediate_prospects"
             },
             name="process_bronze_data_node",
             tags=["processing", "bronze"]

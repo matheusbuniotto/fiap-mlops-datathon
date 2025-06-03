@@ -9,23 +9,23 @@ from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
-def process_sql_to_parquet(sql_query: str, bronze_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+def process_sql_to_parquet(sql_query: str, intermediate_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
     """
     Process SQL query and return DataFrame.
 
     Args:
         sql_query: SQL query to execute
-        bronze_data: Optional DataFrame for queries that reference existing data
+        intermediate_data: Optional DataFrame for queries that reference existing data
 
     Returns:
         Processed DataFrame
     """
     con = None
     try:
-        # Create a connection and register bronze data if provided
+        # Create a connection and register intermediate data if provided
         con = duckdb.connect(database=':memory:')
-        if bronze_data is not None:
-            con.register('bronze_data', bronze_data)
+        if intermediate_data is not None:
+            con.register('intermediate_data', intermediate_data)
 
         # Execute the query
         df = con.execute(sql_query).df()
@@ -39,73 +39,73 @@ def process_sql_to_parquet(sql_query: str, bronze_data: Optional[pd.DataFrame] =
         if con is not None:
             con.close()
 
-def process_applicants_silver(sql_query: str, bronze_applicants: pd.DataFrame) -> pd.DataFrame:
-    """Process applicants data to silver layer."""
-    return process_sql_to_parquet(sql_query, bronze_applicants)
+def process_applicants_primary(sql_query: str, intermediate_applicants: pd.DataFrame) -> pd.DataFrame:
+    """Process applicants data to primary layer."""
+    return process_sql_to_parquet(sql_query, intermediate_applicants)
 
-def process_vagas_silver(sql_query: str, bronze_vagas: pd.DataFrame) -> pd.DataFrame:
-    """Process job positions data to silver layer."""
-    return process_sql_to_parquet(sql_query, bronze_vagas)
+def process_vagas_primary(sql_query: str, intermediate_vagas: pd.DataFrame) -> pd.DataFrame:
+    """Process job positions data to primary layer."""
+    return process_sql_to_parquet(sql_query, intermediate_vagas)
 
-def process_prospects_silver(sql_query: str, bronze_prospects: pd.DataFrame) -> pd.DataFrame:
-    """Process prospects data to silver layer."""
-    return process_sql_to_parquet(sql_query, bronze_prospects)
+def process_prospects_primary(sql_query: str, intermediate_prospects: pd.DataFrame) -> pd.DataFrame:
+    """Process prospects data to primary layer."""
+    return process_sql_to_parquet(sql_query, intermediate_prospects)
 
-def process_silver_tables(
+def process_primary_tables(
     applicants_sql: str,
     prospects_sql: str,
     vagas_sql: str,
-    bronze_applicants: pd.DataFrame,
-    bronze_prospects: pd.DataFrame,
-    bronze_vagas: pd.DataFrame,
+    intermediate_applicants: pd.DataFrame,
+    intermediate_prospects: pd.DataFrame,
+    intermediate_vagas: pd.DataFrame,
 ) -> Dict[str, pd.DataFrame]:
     """
-    Process all individual tables to silver layer in a single node.
+    Process all individual tables to primary layer in a single node.
 
     Args:
         applicants_sql: SQL query for applicants
         prospects_sql: SQL query for prospects
         vagas_sql: SQL query for job positions
-        bronze_applicants: Bronze applicants DataFrame
-        bronze_prospects: Bronze prospects DataFrame
-        bronze_vagas: Bronze job positions DataFrame
+        intermediate_applicants: Intermediate applicants DataFrame
+        intermediate_prospects: Intermediate prospects DataFrame
+        intermediate_vagas: Intermediate job positions DataFrame
 
     Returns:
         Dictionary containing processed DataFrames
     """
-    logger.info("Processing all tables to silver layer...")
+    logger.info("Processing all tables to primary layer...")
     
     # Process each table
-    silver_applicants = process_sql_to_parquet(applicants_sql, bronze_applicants)
-    logger.info(f"Processed applicants: {len(silver_applicants)} rows")
+    primary_applicants = process_sql_to_parquet(applicants_sql, intermediate_applicants)
+    logger.info(f"Processed applicants: {len(primary_applicants)} rows")
     
-    silver_prospects = process_sql_to_parquet(prospects_sql, bronze_prospects)
-    logger.info(f"Processed prospects: {len(silver_prospects)} rows")
+    primary_prospects = process_sql_to_parquet(prospects_sql, intermediate_prospects)
+    logger.info(f"Processed prospects: {len(primary_prospects)} rows")
     
-    silver_vagas = process_sql_to_parquet(vagas_sql, bronze_vagas)
-    logger.info(f"Processed job positions: {len(silver_vagas)} rows")
+    primary_vagas = process_sql_to_parquet(vagas_sql, intermediate_vagas)
+    logger.info(f"Processed job positions: {len(primary_vagas)} rows")
     
     return {
-        "silver_applicants": silver_applicants,
-        "silver_prospects": silver_prospects,
-        "silver_vagas": silver_vagas
+        "primary_applicants": primary_applicants,
+        "primary_prospects": primary_prospects,
+        "primary_vagas": primary_vagas
     }
 
-def process_core_silver(
+def process_core_primary(
     sql_query: str,
-    silver_applicants: pd.DataFrame,
-    silver_vagas: pd.DataFrame,
-    silver_prospects: pd.DataFrame
+    primary_applicants: pd.DataFrame,
+    primary_vagas: pd.DataFrame,
+    primary_prospects: pd.DataFrame
 ) -> pd.DataFrame:
-    """Process core integrated data to silver layer."""
+    """Process core integrated data to primary layer."""
     con = None
     try:
         con = duckdb.connect(database=':memory:')
         
         # Register all necessary tables
-        con.register('silver_applicants', silver_applicants)
-        con.register('silver_vagas', silver_vagas)
-        con.register('silver_prospects', silver_prospects)
+        con.register('primary_applicants', primary_applicants)
+        con.register('primary_vagas', primary_vagas)
+        con.register('primary_prospects', primary_prospects)
 
         # Execute the query
         df = con.execute(sql_query).df()

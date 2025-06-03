@@ -5,7 +5,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Caminhos absolutos baseados no diretório do script
-sql_path = os.path.join(BASE_DIR, "materialize_silver")
+sql_path = os.path.join(BASE_DIR, "materialize_primary")
 output_path = os.path.join(BASE_DIR, "../../data/03_primary")
 
 # Lista de tabelas a serem processadas

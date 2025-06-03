@@ -24,68 +24,68 @@ processed_vagas:
 processed_prospects:
   type: MemoryDataset
 
-# Bronze layer datasets (Parquet outputs)
-bronze_applicants:
+# Intermediate layer datasets (Parquet outputs)
+intermediate_applicants:
   type: pandas.ParquetDataset
   filepath: data/02_intermediate/applicants.parquet
   save_args:
     compression: snappy
     engine: pyarrow
     
-bronze_vagas:
+intermediate_vagas:
   type: pandas.ParquetDataset
   filepath: data/02_intermediate/vagas.parquet
   save_args:
     compression: snappy
     engine: pyarrow
     
-bronze_prospects:
+intermediate_prospects:
   type: pandas.ParquetDataset
   filepath: data/02_intermediate/prospects.parquet
   save_args:
     compression: snappy
     engine: pyarrow
 
-# Silver layer SQL files
+# Primary layer SQL files
 sql_applicants:
   type: text.TextDataset
-  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/applicants.sql
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/applicants.sql
 
 sql_vagas:
   type: text.TextDataset
-  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/vagas.sql
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/vagas.sql
 
 sql_prospects:
   type: text.TextDataset
-  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/prospects.sql
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/prospects.sql
 
 sql_core:
   type: text.TextDataset
-  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_silver/core_applicants_jobs_prospects.sql
+  filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/core_applicants_jobs_prospects.sql
 
-# Silver layer datasets (Parquet outputs)
-silver_applicants:
+# Primary layer datasets (Parquet outputs)
+primary_applicants:
   type: pandas.ParquetDataset
   filepath: data/03_primary/applicants.parquet
   save_args:
     compression: snappy
     engine: pyarrow
     
-silver_vagas:
+primary_vagas:
   type: pandas.ParquetDataset
   filepath: data/03_primary/vagas.parquet
   save_args:
     compression: snappy
     engine: pyarrow
     
-silver_prospects:
+primary_prospects:
   type: pandas.ParquetDataset
   filepath: data/03_primary/prospects.parquet
   save_args:
     compression: snappy
     engine: pyarrow
 
-silver_core:
+primary_core:
   type: pandas.ParquetDataset
   filepath: data/03_primary/core_applicants_jobs_prospects.parquet
   save_args:

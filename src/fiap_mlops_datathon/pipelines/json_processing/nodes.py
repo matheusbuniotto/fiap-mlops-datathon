@@ -243,7 +243,7 @@ def process_all_json_data(
     logger.info(f"Processed prospects: {len(prospects_df)} records")
     
     return {
-        "bronze_applicants": applicants_df,
-        "bronze_vagas": vagas_df,
-        "bronze_prospects": prospects_df
+        "intermediate_applicants": applicants_df,
+        "intermediate_vagas": vagas_df,
+        "intermediate_prospects": prospects_df
     }
