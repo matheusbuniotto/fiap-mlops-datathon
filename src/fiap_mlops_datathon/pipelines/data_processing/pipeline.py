@@ -38,7 +38,7 @@ def create_primary_layer_pipeline(**kwargs) -> Pipeline:
         node(
             func=process_core_primary,
             inputs=[
-                "sql_core",
+                "sql_core_join",
                 "primary_applicants",
                 "primary_vagas", 
                 "primary_prospects"
