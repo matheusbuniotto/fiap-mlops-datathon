@@ -59,11 +59,10 @@ sql_prospects:
   type: text.TextDataset
   filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/prospects.sql
 
-sql_core:
+sql_core_join:
   type: text.TextDataset
   filepath: src/fiap_mlops_datathon/pipelines/data_processing/materialize_primary/core_applicants_jobs_prospects.sql
 
-# Primary layer datasets (Parquet outputs)
 primary_applicants:
   type: pandas.ParquetDataset
   filepath: data/03_primary/applicants.parquet
