@@ -49,6 +49,39 @@ def create_primary_layer_pipeline(**kwargs) -> Pipeline:
         )
     ])
 
+def create_feature_pipeline(**kwargs) -> Pipeline:
+    """Cria pipeline para processamento de features"""
+    return pipeline([
+        node(
+            func=process_sql_to_parquet,
+            inputs=["primary_core", "parameters"],
+            outputs="processed_features",
+            name="feature_engineering_node"
+        ),
+        node(
+            func=split_train_test,
+            inputs=["processed_features", "parameters"],
+            outputs=["X_train", "X_test", "y_train", "y_test"],
+            name="train_test_split_node"
+        ),
+        node(
+            func=save_feature_data,
+            inputs=["X_train", "X_test", "y_train", "y_test"],
+            outputs=None,
+            name="save_features_node"
+        )
+    ])
+
+def save_feature_data(X_train, X_test, y_train, y_test):
+    """Salva os dados processados no diretório de features"""
+    output_dir = "data/04_feature"
+    os.makedirs(output_dir, exist_ok=True)
+    X_train.to_parquet(f"{output_dir}/X_train.parquet")
+    X_test.to_parquet(f"{output_dir}/X_test.parquet")
+    y_train.to_parquet(f"{output_dir}/y_train.parquet")
+    y_test.to_parquet(f"{output_dir}/y_test.parquet")
+    logger.info(f"Dados de features salvos em {output_dir}")
+
 def create_pipeline(**kwargs) -> Pipeline:
     """
     Main pipeline creation function.

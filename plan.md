@@ -15,6 +15,6 @@ Documentar e planejar as alterações necessárias no projeto de processamento d
 - Adicionar logging detalhado no processamento
 
 ## Próximos Passos
-1. Revisar e ajustar este plano
-2. Implementar cada módulo conforme prioridade
-3. Validar com testes e dados de exemplo
+1. Implementar monitoramento de qualidade de dados
+2. Adicionar versionamento de modelos
+3. Criar pipeline de deploy automatizado

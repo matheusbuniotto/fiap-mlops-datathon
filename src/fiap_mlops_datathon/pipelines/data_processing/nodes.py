@@ -9,7 +9,42 @@ from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 def process_sql_to_parquet(sql_query: str, intermediate_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+    """Processa dados com tratamento de nulos, codificação categórica e embeddings de texto"""
+    logger.info("Iniciando processamento de features")
+    
+    # Tratamento de valores nulos
+    imputer = SimpleImputer(strategy='most_frequent')
+    intermediate_data = pd.DataFrame(
+        imputer.fit_transform(intermediate_data),
+        columns=intermediate_data.columns
+    )
+    
+    # Codificação de categorias ordenadas
+    ordinal_encoder = OrdinalEncoder()
+    categorical_cols = [col for col in intermediate_data.columns if 'categoria' in col]
+    if categorical_cols:
+        intermediate_data[categorical_cols] = ordinal_encoder.fit_transform(intermediate_data[categorical_cols])
+    
+    # Processamento de texto para colunas CV
+    cv_cols = [col for col in intermediate_data.columns if col.startswith('cv_')]
+    for col in cv_cols:
+        tfidf = TfidfVectorizer(max_features=100)
+        embeddings = tfidf.fit_transform(intermediate_data[col])
+        intermediate_data[f'{col}_embedding'] = list(embeddings.toarray())
+        logger.info(f"Texto processado para {col} com {len(tfidf.vocabulary_)} termos")
+    
+    return intermediate_data
+
+def split_train_test(data: pd.DataFrame, test_size: float = 0.2) -> tuple:
+    """Divide os dados em conjuntos de treino e teste"""
+    from sklearn.model_selection import train_test_split
+    logger.info(f"Dividindo dados em treino/teste (test_size={test_size})")
+    return train_test_split(data, test_size=test_size, random_state=42)
     """
     Process SQL query and return DataFrame.
 
