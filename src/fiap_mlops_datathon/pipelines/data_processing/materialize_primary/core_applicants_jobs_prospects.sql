@@ -1,9 +1,9 @@
 SELECT
     -- Informações da vaga
-    v.vaga_id,
+    v.vaga_id::INT AS vaga_id,
     v.titulo_vaga,
     v.cliente,
-    v.vaga_sap,
+    CASE WHEN v.vaga_sap ILIKE 'sim' THEN 1 ELSE 0 END AS vaga_sap,
     v.nivel_profissional_vaga,
     v.nivel_academico_vaga,
     v.nivel_ingles_vaga,
@@ -15,8 +15,8 @@ SELECT
     v.cidade,
 
     -- Informações da prospecção
-    p.prospect_id,
-    p.codigo,
+    p.prospect_id::INT AS prospect_id,
+    p.codigo::INT AS codigo,
     p.nome_candidato,
     p.situacao_candidado,
     p.data_candidatura,
@@ -26,7 +26,7 @@ SELECT
 
 
     -- Informações do candidato
-    a.prospect_codigo,
+    a.prospect_codigo::INT AS prospect_codigo,
     a.nome,
     a.email,
     a.area_atuacao,
@@ -38,10 +38,10 @@ SELECT
     a.cv_pt,
 
     -- Target
-    CASE 
-        WHEN situacao_candidado LIKE '%Contratado%' THEN 1 
-        ELSE 0 
-    END AS target_contratado 
+    CASE
+        WHEN situacao_candidado LIKE '%Contratado%' THEN 1
+        ELSE 0
+    END AS target_contratado
 
 FROM read_parquet('data/03_primary/vagas.parquet') v
 LEFT JOIN read_parquet('data/03_primary/prospects.parquet') p
