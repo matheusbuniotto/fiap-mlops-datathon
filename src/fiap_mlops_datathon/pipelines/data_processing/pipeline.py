@@ -4,7 +4,7 @@ This pipeline orchestrates the data processing flow.
 """
 
 from kedro.pipeline import Pipeline, node, pipeline
-from .nodes import process_primary_tables, process_core_primary
+from .nodes import process_primary_tables
 
 def create_primary_layer_pipeline(**kwargs) -> Pipeline:
     """
@@ -18,69 +18,19 @@ def create_primary_layer_pipeline(**kwargs) -> Pipeline:
         node(
             func=process_primary_tables,
             inputs={
-                "applicants_sql": "sql_applicants",
                 "prospects_sql": "sql_prospects",
                 "vagas_sql": "sql_vagas",
-                "intermediate_applicants": "intermediate_applicants",
                 "intermediate_prospects": "intermediate_prospects",
                 "intermediate_vagas": "intermediate_vagas"
             },
             outputs={
-                "primary_applicants": "primary_applicants",
                 "primary_prospects": "primary_prospects",
                 "primary_vagas": "primary_vagas"
             },
             name="process_primary_tables_node",
             tags=["primary", "tables"]
-        ),
-        
-        # Process final table with joins
-        node(
-            func=process_core_primary,
-            inputs=[
-                "sql_core_join",
-                "primary_applicants",
-                "primary_vagas", 
-                "primary_prospects"
-            ],
-            outputs="primary_core",
-            name="process_primary_core_node",
-            tags=["primary", "core"]
         )
     ])
-
-def create_feature_pipeline(**kwargs) -> Pipeline:
-    """Cria pipeline para processamento de features"""
-    return pipeline([
-        node(
-            func=process_sql_to_parquet,
-            inputs=["primary_core", "parameters"],
-            outputs="processed_features",
-            name="feature_engineering_node"
-        ),
-        node(
-            func=split_train_test,
-            inputs=["processed_features", "parameters"],
-            outputs=["X_train", "X_test", "y_train", "y_test"],
-            name="train_test_split_node"
-        ),
-        node(
-            func=save_feature_data,
-            inputs=["X_train", "X_test", "y_train", "y_test"],
-            outputs=None,
-            name="save_features_node"
-        )
-    ])
-
-def save_feature_data(X_train, X_test, y_train, y_test):
-    """Salva os dados processados no diretório de features"""
-    output_dir = "data/04_feature"
-    os.makedirs(output_dir, exist_ok=True)
-    X_train.to_parquet(f"{output_dir}/X_train.parquet")
-    X_test.to_parquet(f"{output_dir}/X_test.parquet")
-    y_train.to_parquet(f"{output_dir}/y_train.parquet")
-    y_test.to_parquet(f"{output_dir}/y_test.parquet")
-    logger.info(f"Dados de features salvos em {output_dir}")
 
 def create_pipeline(**kwargs) -> Pipeline:
     """

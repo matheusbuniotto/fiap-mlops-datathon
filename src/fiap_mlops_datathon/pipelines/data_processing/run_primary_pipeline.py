@@ -9,7 +9,7 @@ sql_path = os.path.join(BASE_DIR, "materialize_primary")
 output_path = os.path.join(BASE_DIR, "../../data/03_primary")
 
 # Lista de tabelas a serem processadas
-tables = ["vagas", "prospects", "applicants"]
+tables = ["vagas", "prospects"]
 
 # Garante que o diretório de saída existe
 os.makedirs(output_path, exist_ok=True)
@@ -18,30 +18,15 @@ os.makedirs(output_path, exist_ok=True)
 for table in tables:
     sql_file = os.path.join(sql_path, f"{table}.sql")
     output_file = os.path.join(output_path, f"{table}.parquet")
-
+    
     if not os.path.exists(sql_file):
         raise FileNotFoundError(f"Arquivo SQL não encontrado: {sql_file}")
-
+        
     with open(sql_file, 'r', encoding='utf-8') as f:
         query = f.read()
-
+        
     # Executa a query e salva o resultado em Parquet
     df = duckdb.sql(query).df()
     df.to_parquet(output_file, index=False)
-
+    
     print(f"✔ Tabela '{table}' salva em '{output_file}'")
-
-# Materializar tabela final com joins
-final_sql_file = os.path.join(sql_path, "core_applicants_jobs_prospects.sql")
-final_output_file = os.path.join(output_path, "core_applicants_jobs_prospects.parquet")
-
-if not os.path.exists(final_sql_file):
-    raise FileNotFoundError(f"Arquivo SQL da tabela final não encontrado: {final_sql_file}")
-
-with open(final_sql_file, 'r', encoding='utf-8') as f:
-    final_query = f.read()
-
-df_final = duckdb.sql(final_query).df()
-df_final.to_parquet(final_output_file, index=False)
-
-print(f"✔ Tabela unificada salva em '{final_output_file}'")
