@@ -4,7 +4,9 @@ This pipeline orchestrates the data processing flow.
 """
 
 from kedro.pipeline import Pipeline, node, pipeline
+
 from .nodes import process_primary_tables
+
 
 def create_primary_layer_pipeline(**kwargs) -> Pipeline:
     """

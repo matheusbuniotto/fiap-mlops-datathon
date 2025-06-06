@@ -38,6 +38,7 @@ SELECT
     a.cv_pt,
 
     -- Target
+    
     CASE
         WHEN situacao_candidado LIKE '%Contratado%' THEN 1
         ELSE 0

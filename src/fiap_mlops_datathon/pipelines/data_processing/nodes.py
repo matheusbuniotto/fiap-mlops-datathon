@@ -2,14 +2,18 @@
 Nodes for SQL to Parquet processing.
 """
 
+import logging
+from typing import Dict, Optional
+
 import duckdb
 import pandas as pd
-import logging
-from typing import Optional, Dict
 
 logger = logging.getLogger(__name__)
 
-def process_sql_to_parquet(sql_query: str, intermediate_data: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+
+def process_sql_to_parquet(
+    sql_query: str, intermediate_data: Optional[pd.DataFrame] = None
+) -> pd.DataFrame:
     """
     Process SQL query and return DataFrame.
 
@@ -23,9 +27,9 @@ def process_sql_to_parquet(sql_query: str, intermediate_data: Optional[pd.DataFr
     con = None
     try:
         # Create a connection and register intermediate data if provided
-        con = duckdb.connect(database=':memory:')
+        con = duckdb.connect(database=":memory:")
         if intermediate_data is not None:
-            con.register('intermediate_data', intermediate_data)
+            con.register("intermediate_data", intermediate_data)
 
         # Execute the query
         df = con.execute(sql_query).df()
@@ -39,13 +43,20 @@ def process_sql_to_parquet(sql_query: str, intermediate_data: Optional[pd.DataFr
         if con is not None:
             con.close()
 
-def process_vagas_primary(sql_query: str, intermediate_vagas: pd.DataFrame) -> pd.DataFrame:
+
+def process_vagas_primary(
+    sql_query: str, intermediate_vagas: pd.DataFrame
+) -> pd.DataFrame:
     """Process job positions data to primary layer."""
     return process_sql_to_parquet(sql_query, intermediate_vagas)
 
-def process_prospects_primary(sql_query: str, intermediate_prospects: pd.DataFrame) -> pd.DataFrame:
+
+def process_prospects_primary(
+    sql_query: str, intermediate_prospects: pd.DataFrame
+) -> pd.DataFrame:
     """Process prospects data to primary layer."""
     return process_sql_to_parquet(sql_query, intermediate_prospects)
+
 
 def process_primary_tables(
     prospects_sql: str,
@@ -66,14 +77,11 @@ def process_primary_tables(
         Dictionary containing processed DataFrames
     """
     logger.info("Processing all tables to primary layer...")
-    
+
     primary_prospects = process_sql_to_parquet(prospects_sql, intermediate_prospects)
     logger.info(f"Processed prospects: {len(primary_prospects)} rows")
-    
+
     primary_vagas = process_sql_to_parquet(vagas_sql, intermediate_vagas)
     logger.info(f"Processed job positions: {len(primary_vagas)} rows")
-    
-    return {
-        "primary_prospects": primary_prospects,
-        "primary_vagas": primary_vagas
-    }
+
+    return {"primary_prospects": primary_prospects, "primary_vagas": primary_vagas}
